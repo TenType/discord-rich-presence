@@ -1,11 +1,3 @@
-"""
-File Name: discordrp.py
-Author: TenType
-License: MIT
-
-A lightweight and safe module for creating custom rich presences on Discord.
-"""
-
 import json
 import os
 import socket
@@ -70,16 +62,16 @@ class Presence:
                 'small_image': str,
                 'small_text': str,
             },
-            'buttons': {
-                [{
+            'buttons': [
+                {
                     'label': str,
                     'url': str,
                 },
                 {
                     'label': str,
                     'url': str,
-                }],
-            }
+                }
+            ],
         }
         ```
         One field of either 'state', 'details', or 'timestamps.start' is required.
