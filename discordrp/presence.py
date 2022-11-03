@@ -32,7 +32,7 @@ class Presence:
     The main class used to connect to Discord for its rich presence API.
     """
 
-    def __init__(self, client_id: int):
+    def __init__(self, client_id: str):
         self.client_id = client_id
         self._platform = sys.platform
         self._socket = None
