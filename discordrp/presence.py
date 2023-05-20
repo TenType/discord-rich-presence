@@ -116,7 +116,7 @@ class Presence:
     def _get_pipe(self) -> str:
         if self._platform == WINDOWS:
             # Windows pipe
-            return R'\\?\pipe\\' + SOCKET_NAME
+            return R'\\.\pipe\\' + SOCKET_NAME
 
         # Unix pipe
         for env in ('XDG_RUNTIME_DIR', 'TMPDIR', 'TMP', 'TEMP'):
@@ -128,7 +128,7 @@ class Presence:
 
     def _try_socket(self, pipe: str, i: int):
         if self._platform == WINDOWS:
-            self._socket = open(pipe.format(i), 'wb')
+            self._socket = open(pipe.format(i), 'rb+')
         else:
             self._socket = socket.socket(socket.AF_UNIX)
             self._socket.connect(pipe.format(i))
