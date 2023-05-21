@@ -128,7 +128,7 @@ class Presence:
         return os.path.join('/tmp/', SOCKET_NAME)
 
     def _try_socket(self, pipe: str, i: int) -> None:
-        if self._platform == WINDOWS:
+        if sys.platform == 'win32':
             self._socket = open(pipe.format(i), 'rb+')
         else:
             self._socket = socket.socket(socket.AF_UNIX)
