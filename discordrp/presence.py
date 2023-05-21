@@ -5,7 +5,8 @@ import struct
 import sys
 
 from enum import IntEnum
-from typing import Any
+from typing import Any, cast
+from types import TracebackType
 from uuid import uuid4
 
 class OpCode(IntEnum):
@@ -35,7 +36,7 @@ class Presence:
     def __init__(self, client_id: str):
         self.client_id = client_id
         self._platform = sys.platform
-        self._socket = None
+        self._socket: Any = None
 
         # Connect to Discord IPC
         self._connect()
@@ -43,7 +44,7 @@ class Presence:
         # Send a handshake request
         self._handshake()
 
-    def set(self, activity):
+    def set(self, activity: dict[str, Any] | None) -> None:
         """
         Sends an activity payload to Discord.
         :param activity: A dictionary of this format:
@@ -86,13 +87,13 @@ class Presence:
         }
         self._send(payload, OpCode.FRAME)
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Clears the current activity.
         """
         self.set(None)
 
-    def close(self):
+    def close(self) -> None:
         """
         Closes the current connection.
         This method is automatically called when the program exits using the 'with' statement.
@@ -100,7 +101,7 @@ class Presence:
         self._send({}, OpCode.CLOSE)
         self._socket.close()
 
-    def _connect(self):
+    def _connect(self) -> None:
         pipe = self._get_pipe()
 
         # Try to connect to a socket, starting from 0 up to 9
@@ -126,14 +127,14 @@ class Presence:
 
         return os.path.join('/tmp/', SOCKET_NAME)
 
-    def _try_socket(self, pipe: str, i: int):
+    def _try_socket(self, pipe: str, i: int) -> None:
         if self._platform == WINDOWS:
             self._socket = open(pipe.format(i), 'rb+')
         else:
             self._socket = socket.socket(socket.AF_UNIX)
             self._socket.connect(pipe.format(i))
 
-    def _handshake(self):
+    def _handshake(self) -> None:
         data = {
             'v': 1,
             'client_id': self.client_id,
@@ -152,7 +153,7 @@ class Presence:
         return op, data
 
     def _read_header(self) -> tuple[int, int]:
-        return struct.unpack('<ii', self._read_bytes(8))
+        return cast(tuple[int, int], struct.unpack('<ii', self._read_bytes(8)))
 
     def _read_bytes(self, size: int) -> bytes:
         encoded = b''
@@ -165,21 +166,26 @@ class Presence:
             size -= len(encoded)
         return encoded
 
-    def _send(self, payload: dict[str, int], op: OpCode):
+    def _send(self, payload: dict[str, Any], op: OpCode) -> None:
         data_json = json.dumps(payload)
         encoded = data_json.encode('utf-8')
         header = struct.pack('<ii', int(op), len(encoded))
         self._write(header + encoded)
 
-    def _write(self, data: bytes):
+    def _write(self, data: bytes) -> None:
         if self._platform == WINDOWS:
             self._socket.write(data)
             self._socket.flush()
         else:
             self._socket.sendall(data)
 
-    def __enter__(self):
+    def __enter__(self) -> 'Presence':
         return self
 
-    def __exit__(self, exc_type, exc_value, exc_traceback):
+    def __exit__(
+        self,
+        exc_type: type[BaseException],
+        exc_value: BaseException,
+        exc_traceback: TracebackType
+    ) -> None:
         self.close()
