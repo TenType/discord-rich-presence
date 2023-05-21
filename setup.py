@@ -24,4 +24,5 @@ setup(
         'Typing :: Typed',
     ],
     python_requires='>=3.9',
+    package_data={"discordrp": ["py.typed"]},
 )
