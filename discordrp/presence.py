@@ -35,7 +35,6 @@ class Presence:
 
     def __init__(self, client_id: str):
         self.client_id = client_id
-        self._platform = sys.platform
         self._socket: Any = None
 
         # Connect to Discord IPC
@@ -115,7 +114,7 @@ class Presence:
             raise PresenceError('Cannot find a socket to connect to Discord')
 
     def _get_pipe(self) -> str:
-        if self._platform == WINDOWS:
+        if sys.platform == 'win32':
             # Windows pipe
             return R'\\.\pipe\\' + SOCKET_NAME
 
@@ -158,7 +157,7 @@ class Presence:
     def _read_bytes(self, size: int) -> bytes:
         encoded = b''
         while size > 0:
-            if self._platform == WINDOWS:
+            if sys.platform == 'win32':
                 encoded += self._socket.read(size)
             else:
                 encoded += self._socket.recv(size)
@@ -173,7 +172,7 @@ class Presence:
         self._write(header + encoded)
 
     def _write(self, data: bytes) -> None:
-        if self._platform == WINDOWS:
+        if sys.platform == 'win32':
             self._socket.write(data)
             self._socket.flush()
         else:
