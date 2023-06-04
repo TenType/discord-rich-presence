@@ -164,7 +164,7 @@ class _UnixSocket(_Socket):
         # Try to connect to a socket, starting from 0 up to 9
         for i in range(10):
             try:
-                self._sock = socket.socket(socket.AF_UNIX)
+                self._sock = socket.socket(socket.AF_UNIX)  # type: ignore [attr-defined,unused-ignore]
                 self._sock.connect(pipe.format(i))
                 break
             except FileNotFoundError:
