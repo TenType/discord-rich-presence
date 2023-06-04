@@ -6,7 +6,7 @@ import sys
 
 from abc import ABC, abstractmethod
 from enum import IntEnum
-from typing import Any, cast
+from typing import Any, Optional, cast
 from types import TracebackType
 from uuid import uuid4
 
@@ -44,7 +44,7 @@ class Presence:
         # Send a handshake request
         self._handshake()
 
-    def set(self, activity: dict[str, Any] | None) -> None:
+    def set(self, activity: Optional[dict[str, Any]]) -> None:
         """
         Sends an activity payload to Discord.
         :param activity: A dictionary of this format:
@@ -134,9 +134,9 @@ class Presence:
 
     def __exit__(
         self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        exc_traceback: TracebackType | None,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        exc_traceback: Optional[TracebackType],
     ) -> None:
         self.close()
 
