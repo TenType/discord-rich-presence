@@ -23,8 +23,6 @@ class _OpCode(IntEnum):
 
 SOCKET_NAME = 'discord-ipc-{}'
 
-WINDOWS = 'win32'
-
 class PresenceError(Exception):
     """
     Errors emitted by the Presence class.
