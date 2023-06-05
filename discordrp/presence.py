@@ -10,7 +10,7 @@ from typing import Any, Optional, cast
 from types import TracebackType
 from uuid import uuid4
 
-class OpCode(IntEnum):
+class _OpCode(IntEnum):
     """
     A list of valid opcodes that can be sent in packets to Discord.
     """
@@ -85,7 +85,7 @@ class Presence:
             },
             'nonce': str(uuid4()),
         }
-        self._send(payload, OpCode.FRAME)
+        self._send(payload, _OpCode.FRAME)
 
     def clear(self) -> None:
         """
@@ -98,11 +98,11 @@ class Presence:
         Closes the current connection.
         This method is automatically called when the program exits using the 'with' statement.
         """
-        self._send({}, OpCode.CLOSE)
+        self._send({}, _OpCode.CLOSE)
         self._socket._close()
 
     def _handshake(self) -> None:
-        self._send({'v': 1, 'client_id': self.client_id}, OpCode.HANDSHAKE)
+        self._send({'v': 1, 'client_id': self.client_id}, _OpCode.HANDSHAKE)
         data = self._read()
 
         if data.get('evt') != 'READY':
@@ -124,7 +124,7 @@ class Presence:
             size -= len(encoded)
         return encoded
 
-    def _send(self, payload: dict[str, Any], op: OpCode) -> None:
+    def _send(self, payload: dict[str, Any], op: _OpCode) -> None:
         encoded = json.dumps(payload).encode('utf-8')
         header = struct.pack('<ii', int(op), len(encoded))
         self._socket._write(header + encoded)
