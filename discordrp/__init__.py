@@ -8,5 +8,5 @@ __title__ = "discord-rich-presence"
 __author__ = "TenType"
 __copyright__ = "Copyright 2022-2023 TenType"
 __license__ = "MIT"
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 __all__ = ("ActivityError", "ClientIDError", "Presence", "PresenceError")
