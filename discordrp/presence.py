@@ -28,8 +28,12 @@ SOCKET_NAME = "discord-ipc-{}"
 
 class PresenceError(Exception):
     """
-    Errors emitted by the Presence class.
+    An error emitted from Discord. See the [docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#rpc) for more details.
     """
+
+    def __init__(self, message: object, code: int):
+        super().__init__(message)
+        self.code = code
 
 
 class Presence:
@@ -50,37 +54,11 @@ class Presence:
 
     def set(self, activity: Optional[dict[str, Any]]) -> None:
         """
-        Sends an activity payload to Discord.
-        :param activity: A dictionary of this format:
+        Sets the current activity using a dictionary representing a [Discord activity object](https://discord.com/developers/docs/topics/gateway-events#activity-object).
 
-        ```
-        {
-            'state': str,
-            'details': str,
-            'timestamps': {
-                'start': int,
-                'end': int,
-            },
-            'assets': {
-                'large_image': str,
-                'large_text': str,
-                'small_image': str,
-                'small_text': str,
-            },
-            'buttons': [
-                {
-                    'label': str,
-                    'url': str,
-                },
-                {
-                    'label': str,
-                    'url': str,
-                }
-            ],
-        }
-        ```
-        One field of either 'state', 'details', or 'timestamps.start' is required.
+        Raises a `PresenceError` if Discord rejected the payload.
         """
+
         payload = {
             "cmd": "SET_ACTIVITY",
             "args": {
@@ -90,6 +68,23 @@ class Presence:
             "nonce": str(uuid4()),
         }
         self._send(payload, _OpCode.FRAME)
+
+        # Check for errors
+        reply = self._read()
+        if reply.get("evt") != "ERROR":
+            return
+
+        message: str = reply["data"]["message"]
+        code: int = reply["data"]["code"]
+
+        if code == 4000:
+            # Improve readability of the error message if the dictionary is invalid
+            prefix = 'child "activity" fails because ['
+            if message.startswith(prefix):
+                message = message[len(prefix) : -1]
+            raise PresenceError(f"Invalid activity: {message}", code)
+
+        raise PresenceError(message, code)
 
     def clear(self) -> None:
         """
@@ -102,17 +97,17 @@ class Presence:
         Closes the current connection.
         This method is automatically called when the program exits using the 'with' statement.
         """
-        self._send({}, _OpCode.CLOSE)
-        self._socket._close()
+        try:
+            self._send({}, _OpCode.CLOSE)
+        finally:
+            self._socket._close()
 
     def _handshake(self) -> None:
         self._send({"v": 1, "client_id": self.client_id}, _OpCode.HANDSHAKE)
-        data = self._read()
+        payload = self._read()
 
-        if data.get("evt") != "READY":
-            raise PresenceError(
-                "Discord returned an error response after a handshake request"
-            )
+        if payload.get("evt") != "READY":
+            raise PresenceError(payload["message"], payload["code"])
 
     def _read(self) -> dict[str, Any]:
         op, length = self._read_header()
@@ -178,7 +173,7 @@ class _UnixSocket(_Socket):
             except FileNotFoundError:
                 pass
         else:
-            raise PresenceError("Cannot find a Unix socket to connect to Discord")
+            raise FileNotFoundError("Cannot find a Unix socket to connect to Discord")
 
     def _get_pipe_path(self) -> str:
         for env in ("XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"):
@@ -210,7 +205,9 @@ class _WindowsSocket(_Socket):
             except FileNotFoundError:
                 pass
         else:
-            raise PresenceError("Cannot find a Windows socket to connect to Discord")
+            raise FileNotFoundError(
+                "Cannot find a Windows socket to connect to Discord"
+            )
 
     def _read(self, size: int) -> bytes:
         return self._buffer.read(size)
