@@ -24,6 +24,7 @@ class _OpCode(IntEnum):
 
 
 SOCKET_NAME = "discord-ipc-{}"
+INVALID_PAYLOAD = 4000
 
 
 class PresenceError(Exception):
@@ -31,9 +32,27 @@ class PresenceError(Exception):
     An error emitted from Discord. See the [docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#rpc) for more details.
     """
 
-    def __init__(self, message: object, code: int):
+    def __init__(self, message: object, code: int) -> None:
         super().__init__(message)
         self.code = code
+
+
+class ClientIDError(PresenceError):
+    """
+    Invalid client ID.
+    """
+
+    def __init__(self) -> None:
+        super().__init__("Client ID is invalid", INVALID_PAYLOAD)
+
+
+class ActivityError(PresenceError):
+    """
+    Discord rejected the payload because the activity was not in the [correct format](https://discord.com/developers/docs/topics/gateway-events#activity-object).
+    """
+
+    def __init__(self, message: object) -> None:
+        super().__init__(message, INVALID_PAYLOAD)
 
 
 class Presence:
@@ -77,12 +96,12 @@ class Presence:
         message: str = reply["data"]["message"]
         code: int = reply["data"]["code"]
 
-        if code == 4000:
+        if code == INVALID_PAYLOAD:
             # Improve readability of the error message if the dictionary is invalid
             prefix = 'child "activity" fails because ['
             if message.startswith(prefix):
                 message = message[len(prefix) : -1]
-            raise PresenceError(f"Invalid activity: {message}", code)
+            raise ActivityError(message)
 
         raise PresenceError(message, code)
 
@@ -107,6 +126,8 @@ class Presence:
         payload = self._read()
 
         if payload.get("evt") != "READY":
+            if payload["code"] == INVALID_PAYLOAD:
+                raise ClientIDError()
             raise PresenceError(payload["message"], payload["code"])
 
     def _read(self) -> dict[str, Any]:
@@ -123,7 +144,9 @@ class Presence:
         while size > 0:
             chunk = self._socket._read(size)
             if not chunk:
-                raise ConnectionAbortedError("Connection closed before all bytes were read")
+                raise ConnectionAbortedError(
+                    "Connection closed before all bytes were read"
+                )
             data += chunk
             size -= len(chunk)
         return data
