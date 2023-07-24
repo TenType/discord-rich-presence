@@ -1,5 +1,5 @@
 # discord-rich-presence
-A lightweight and safe module for creating custom rich presences on Discord.
+A lightweight and safe package for creating custom rich presences on Discord.
 
 ## Example
 ![Discord Rich Presence Example](/examples/example.jpg)
@@ -29,6 +29,7 @@ import time
 client_id = "000000000000000000"  # Replace this with your own client id
 
 with Presence(client_id) as presence:
+    print("Connected")
     presence.set(
         {
             "state": "In Game",
@@ -36,6 +37,7 @@ with Presence(client_id) as presence:
             "timestamps": {"start": int(time.time())},
         }
     )
+    print("Presence updated")
 
     while True:
         time.sleep(15)
@@ -45,7 +47,9 @@ Make sure you replace the `client_id` variable with your app's id that you copie
 7. Run the program! You should now see that you have a rich presence on your profile that will be on until you stop the program! Feel free to change the code however you want by adding images, buttons, and more. Check out [examples/complex.py](examples/complex.py) for another example.
 
 ## Troubleshooting
-If you're having trouble using this module, it might be because of the following:
-- your Discord app is not open
-- you passed in an incorrect dictionary, which the Discord API rejected
-- something unexpected occurred while writing data, in which you should try running the program again
+Here are the most common errors:
+- **`ActivityError`**: An incorrect dictionary was passed to `Presence.set`. Make sure that it matches the [format expected by Discord](https://discord.com/developers/docs/topics/gateway-events#activity-object).
+- **`ClientIDError`**: Verify that your client ID is valid.
+- **`PresenceError`**: Read the [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#rpc) for more information.
+- **`ConnectionRefusedError` or `FileNotFoundError`**: Make sure that your Discord application is open and logged in.
+- **Program hangs for a long time and does not set the presence**: Wait for at least 10 seconds before closing and trying again.

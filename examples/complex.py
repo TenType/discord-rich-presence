@@ -4,6 +4,7 @@ import time
 client_id = "000000000000000000"  # Replace this with your own client id
 
 with Presence(client_id) as presence:
+    print("Connected")
     presence.set(
         {
             "state": "state",
@@ -30,6 +31,7 @@ with Presence(client_id) as presence:
             ],
         }
     )
+    print("Presence updated")
 
     while True:
         time.sleep(15)
