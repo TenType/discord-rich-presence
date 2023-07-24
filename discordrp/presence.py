@@ -119,11 +119,14 @@ class Presence:
         return cast(tuple[int, int], struct.unpack("<ii", self._read_bytes(8)))
 
     def _read_bytes(self, size: int) -> bytes:
-        encoded = b""
+        data = b""
         while size > 0:
-            encoded += self._socket._read(size)
-            size -= len(encoded)
-        return encoded
+            chunk = self._socket._read(size)
+            if not chunk:
+                raise ConnectionAbortedError("Connection closed before all bytes were read")
+            data += chunk
+            size -= len(chunk)
+        return data
 
     def _send(self, payload: dict[str, Any], op: _OpCode) -> None:
         encoded = json.dumps(payload).encode("utf-8")
