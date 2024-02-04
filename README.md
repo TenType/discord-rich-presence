@@ -46,9 +46,15 @@ Make sure you replace the `client_id` variable with your app's id that you copie
 
 7. Run the program! You should now see that you have a rich presence on your profile that will be on until you stop the program! Feel free to change the code however you want by adding images, buttons, and more. Check out [examples/complex.py](examples/complex.py) for another example.
 
+## Methods
+Here are the methods on a `Presence` instance:
+- `presence.set()`: Sets the current activity using a dictionary representing a [Discord activity object](https://discord.com/developers/docs/topics/gateway-events#activity-object).
+- `presence.clear()`: Clears the current activity.
+- `presence.close()`: Closes the current connection. This method is automatically called when the program exits using the `with` statement.
+
 ## Troubleshooting
 Here are the most common errors:
-- **`ActivityError`**: An incorrect dictionary was passed to `Presence.set`. Make sure that it matches the [format expected by Discord](https://discord.com/developers/docs/topics/gateway-events#activity-object).
+- **`ActivityError`**: An incorrect dictionary was passed to `presence.set`. Make sure that it matches the [format expected by Discord](https://discord.com/developers/docs/topics/gateway-events#activity-object).
 - **`ClientIDError`**: Verify that your client ID is valid.
 - **`PresenceError`**: Read the [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#rpc) for more information.
 - **`ConnectionRefusedError` or `FileNotFoundError`**: Make sure that your Discord application is open and logged in.
