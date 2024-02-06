@@ -48,7 +48,7 @@ Make sure you replace the `client_id` variable with your app's id that you copie
 
 ## Methods
 Here are the methods on a `Presence` instance:
-- `presence.set()`: Sets the current activity using a dictionary representing a [Discord activity object](https://discord.com/developers/docs/topics/gateway-events#activity-object).
+- `presence.set(activity)`: Sets the current activity using a dictionary representing a [Discord activity object](https://discord.com/developers/docs/topics/gateway-events#activity-object).
 - `presence.clear()`: Clears the current activity.
 - `presence.close()`: Closes the current connection. This method is automatically called when the program exits using the `with` statement.
 
