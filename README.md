@@ -2,7 +2,8 @@
 A lightweight and safe package for creating custom rich presences on Discord.
 
 ## Example
-![Discord Rich Presence Example](/examples/example.jpg)
+![Discord Rich Presence Example](/examples/example.jpg)\
+*(See [examples/complex.py](examples/complex.py) for the source code)*
 
 ## How to Use
 
@@ -44,7 +45,7 @@ with Presence(client_id) as presence:
 ```
 Make sure you replace the `client_id` variable with your app's id that you copied earlier.
 
-7. Run the program! You should now see that you have a rich presence on your profile that will be on until you stop the program! Feel free to change the code however you want by adding images, buttons, and more. Check out [examples/complex.py](examples/complex.py) for another example.
+7. Run the program! You should now see that you have a rich presence on your profile that will be on until you stop the program! See [examples/complex.py](examples/complex.py) for another example with buttons and images.
 
 ## Methods
 Here are the methods on a `Presence` instance:
