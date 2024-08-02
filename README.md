@@ -17,7 +17,7 @@ A lightweight and safe package for creating custom rich presences on Discord.
 4. Install the latest version of [Python](https://www.python.org/downloads/) if you haven't already.
 5. Run the following in your terminal:
 ```
-$ pip install discord-rich-presence
+pip install discord-rich-presence
 ```
 If all goes well, it should say something like "Successfully installed discord-rich-presence".
 
