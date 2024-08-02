@@ -56,7 +56,7 @@ Here are the methods on a `Presence` instance:
 ## Troubleshooting
 Here are the most common errors:
 - **`ActivityError`**: An incorrect dictionary was passed to `presence.set`. Make sure that it matches the [format expected by Discord](https://discord.com/developers/docs/topics/gateway-events#activity-object).
-- **`ClientIDError`**: Verify that your client ID is valid.
+- **`ClientIDError`**: Verify that your client ID is valid and you are passing in the client ID to `Presence` as a string.
 - **`PresenceError`**: Read the [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#rpc) for more information.
 - **`ConnectionRefusedError` or `FileNotFoundError`**: Make sure that your Discord application is open and logged in.
 - **Program hangs for a long time and does not set the presence**: Wait for at least 10 seconds before closing and trying again.
